@@ -6,7 +6,7 @@
 [![MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Maintained by OneByJorah](https://img.shields.io/badge/Maintained%20by-OneByJorah-1E90FF?logo=github)](https://github.com/OneByJorah)
 
-![NTP Dashboard Architecture](https://v3b.fal.media/files/b/0a9e59a6/3Cq6QvN0Qw5qZ7H7vJ0uK4yD9c0g8a.png)
+![NTP Dashboard Architecture](https://v3b.fal.media/files/b/0a9e5aae/JvZsxoUo9qYLoZsucNRBv_OFU9ZbVf.png)
 
 > **NTP Dashboard**: TICC-DASH Time Information of Chrony Clients - Dashboard | A sleek, live‑updating web interface to monitor your Chrony NTP clients. Built with Python (Flask) · Bootstrap 5 · Vanilla JS + AJAX (jQuery) · Chrony/chronyc · systemd
 
