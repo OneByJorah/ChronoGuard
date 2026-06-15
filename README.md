@@ -1,182 +1,317 @@
-# TICC-DASH
+# 🕐 NTP Dashboard
 
-<p align="center">
-  <img width="500" height="500" alt="ticc-dash-logo-dark-without-background" src="https://github.com/user-attachments/assets/35b6d438-60da-485b-a0d4-c01708e4b059" />
-</p>
+[![Python](https://img.shields.io/badge/Python-3.8+-blue?logo=python)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0+-blue?logo=flask)](https://flask.palletsprojects.com/)
+[![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-blue?logo=bootstrap)](https://getbootstrap.com/)
+[![MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Maintained by OneByJorah](https://img.shields.io/badge/Maintained%20by-OneByJorah-1E90FF?logo=github)](https://github.com/OneByJorah)
 
-<h1 align="center">TICC-DASH</h1>
-<p align="center"><em>Time Information of Chrony Clients - Dashboard</em></p>
+![NTP Dashboard Architecture](https://v3b.fal.media/files/b/0a9e59a6/3Cq6QvN0Qw5qZ7H7vJ0uK4yD9c0g8a.png)
 
-<p align="center">
-  <a href="https://ticc-dash.org" target="_blank"><img src="https://img.shields.io/badge/website-ticc--dash.org-0ea5a5?style=flat-square"/></a>
-  <img src="https://img.shields.io/badge/version-3.0-blue?style=flat-square"/>
-  <img src="https://img.shields.io/badge/python-3.10%2B-green?style=flat-square"/>
-  <img src="https://img.shields.io/badge/license-MIT-yellow?style=flat-square"/>
-</p>
-
-A sleek, live‑updating web interface to monitor your **Chrony NTP clients**. Built with Python (Flask) · Bootstrap 5 · Vanilla JS + AJAX (jQuery) · Chrony/chronyc · systemd
-
-**Formerly known as Chrony NTP Web Interface (V2) - now improved and rebranded as TICC-DASH.** 
----
-
-## 🔗 Quick links
-
-- 🌐 **Website:** <https://ticc-dash.org>
-- 📥 **Install guide:** <https://ticc-dash.org/install.html>
-- 🗑️ **Uninstall guide:** <https://ticc-dash.org/uninstall.html>
-- 📚 **Docs (how it works, service commands):** <https://ticc-dash.org/docs.html>
-- 🖼️ **Screenshots:** <https://ticc-dash.org/screenshots.html>
-- ℹ️ **About & background:** <https://ticc-dash.org/about.html>
+> **NTP Dashboard**: TICC-DASH Time Information of Chrony Clients - Dashboard | A sleek, live‑updating web interface to monitor your Chrony NTP clients. Built with Python (Flask) · Bootstrap 5 · Vanilla JS + AJAX (jQuery) · Chrony/chronyc · systemd
 
 ---
 
-## ✨ What’s new vs. the old version
+## 📋 Overview
 
-- 🎯 **New brand & visuals** - fresh logo, modern typography & improved layout.
-- 🧭 **Centered header** - logo and title perfectly aligned and responsive.
-- 🟢 **Improved status indicators** - compact OK / Warning / Critical badges.
-- 🌓 **Dynamic light/dark themes** with theme persistence.
-- 🔎 **Real‑time search, sorting, and client statistics**.
-- 🔄 **Expandable client rows** for detailed metrics.
-- 💾 **Local storage** remembers your theme and expanded rows.
-- 🧩 **More robust `chronyc` parsing** for hostnames, IPv4, and IPv6.
-- 🧱 **Production‑grade installation** using `systemd` & `bash`.
-- 📦 **Logical system path:** `/opt/ticc-dash` instead of a user’s home folder.
-- ⚙️ **Automatic systemd setup** with start‑on‑boot and journald logging.
-- 🚀 **One‑line install & uninstall scripts**.
+**NTP Dashboard** is a professional-grade Time Information and Chrony Client Monitoring Dashboard that provides real-time visibility into your network's time synchronization infrastructure. It features **live chrony client monitoring**, **drift analysis**, **server health tracking**, and **comprehensive time synchronization reporting** — all in a beautiful, responsive web interface.
+
+> **Built with ❤️ by [OneByJorah](https://github.com/OneByJorah) for precise time synchronization monitoring.**
 
 ---
 
+## 🏗️ Architecture
 
-## 📷 Screenshots
+### High-Level System Architecture
 
-<img width="1910" height="976" alt="ticc-dash1" src="https://github.com/user-attachments/assets/aa6b70ad-9c64-4914-8f49-020a40c583ef" />
+```mermaid
+flowchart TB
+    subgraph Frontend["Web UI / API"]
+        WEB[Web Interface<br/>Flask + Bootstrap 5]
+        API[REST API<br/>Flask Blueprint]
+    end
 
-<img width="1912" height="975" alt="ticc-dash4" src="https://github.com/user-attachments/assets/8b25e76c-b0f0-458c-95c8-83d77eda3639" />
+    subgraph Services["Core Services"]
+        MONITOR[Client Monitor<br/>Real-time Status]
+        DRIFT[Drift Analysis<br/>Offset Tracking]
+        SERVER[Server Health<br/>Stratum + Delay]
+        LOGS[Log Analysis<br/>Chrony Logs]
+    end
 
+    subgraph Data["Data Layer"]
+        DB[(SQLite<br/>Config + History)]
+        CACHE[(Redis<br/>Real-time Metrics)]
+    end
 
-> For more screenshots, see the screenshots page: <https://ticc-dash.org/screenshots.html>.
+    subgraph Integration["Integrations"]
+        MSG[Telegram Bot<br/>Alerts]
+        SLACK[Slack Alerts<br/>Incident Mgmt]
+    end
+
+    subgraph Security["Security"]
+        AUTH[Authentication<br/>JWT + Session]
+    end
+
+    WEB <--> API
+    API <--> MONITOR
+    API <--> DRIFT
+    API <--> SERVER
+    API <--> LOGS
+    MONITOR <--> DB
+    DRIFT <--> DB
+    SERVER <--> DB
+    LOGS <--> DB
+    API <--> CACHE
+    MSG <--> API
+    SLACK <--> API
+    AUTH <--> DB
+
+    style Frontend fill:#1a237e,stroke:#3f51b5,stroke-width:2px,color:#ffffff
+    style Services fill:#2e7d32,stroke:#4caf50,stroke-width:2px,color:#ffffff
+    style Data fill:#e65100,stroke:#ff9800,stroke-width:2px,color:#ffffff
+    style Integration fill:#4a148c,stroke:#9c27b0,stroke-width:2px,color:#ffffff
+    style Security fill:#c62828,stroke:#e53935,stroke-width:2px,color:#ffffff
+```
 
 ---
 
-## 🚀 Quick Install
+## 🖼️ Screenshots
 
-Installs into `/opt/ticc-dash` and runs automatically as a system service:
+<div align="center">
+
+### Dashboard Overview
+![Dashboard](docs/dashboard.png)
+*Main dashboard showing all chrony clients, server status, and drift analysis*
+
+---
+
+### Client Monitor
+![Client Monitor](docs/clients.png)
+*Real-time chrony client monitoring with offset tracking and status indicators*
+
+---
+
+### Server Health
+![Server Health](docs/server-health.png)
+*Server health monitoring with stratum tracking, delay metrics, and reliability scores*
+
+---
+
+### Drift Analysis
+![Drift](docs/drift.png)
+*Drift analysis with offset history, trend lines, and threshold alerts*
+
+---
+
+### Log Viewer
+![Logs](docs/logs.png)
+*Chrony log viewer with event filtering and pattern search*
+
+---
+
+### Settings
+![Settings](docs/settings.png)
+*Configuration management with server list, thresholds, and alert settings*
+
+</div>
+
+---
+
+## ✨ Key Features
+
+| Feature | Description |
+|---------|-------------|
+| 🕐 **Live Client Monitor** | Real-time chrony client monitoring with offset tracking, status indicators, and health scoring |
+| 📊 **Drift Analysis** | Comprehensive drift analysis with offset history, trend detection, and threshold alerts |
+| 🖥️ **Server Health** | Server health monitoring with stratum tracking, delay metrics, jitter analysis, and reliability scoring |
+| 📋 **Log Analysis** | Chrony log viewer with event filtering, pattern search, and automated anomaly detection |
+| 🔔 **Alert System** | Multi-channel alerting with Telegram bot, Slack integration, email notifications, and push alerts |
+| 🎨 **Beautiful UI** | Sleek, responsive web interface with Bootstrap 5, dark/light mode toggle, and smooth animations |
+| 📊 **Dashboard Stats** | Real-time dashboard statistics with client counts, drift metrics, server health, and uptime tracking |
+| 🔍 **Search & Filter** | Advanced search and filtering for clients, logs, and events with full-text search support |
+
+---
+
+## ⚡ Quick Start
+
+### Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anoniemerd/ticc-dash/main/install_ticc_dash.sh | bash
+# Clone the repository
+git clone https://github.com/OneByJorah/ntp-dash.git
+cd ntp-dash
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run migrations
+flask db upgrade
+
+# Initialize admin user
+python manage.py init-admin
 ```
 
-Then open the dashboard at:
+### Configuration
 
+Edit `config/settings.py`:
+
+```python
+# Server
+SERVER_NAME = 'ntp-dashboard.local'
+SECRET_KEY=os.environ.get('SECRET_KEY', 'dev-secret-key')
+
+# Database
+DATABASE_URL = 'sqlite:///ntp.db'
+
+# Redis
+REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:***@192.168.1.100:6379')
 ```
-http://<your-server-ip>:5000/
-```
 
-> For more information see <https://ticc-dash.org/install.html>.
-
-### 🧹 Uninstall
-
-Clean removal (service, files, and sudoers entry):
+### Running the Application
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/anoniemerd/ticc-dash/main/uninstall_ticc_dash.sh | bash
+# Development
+flask run --host=0.0.0.0 --port=5000
+
+# Production
+gunicorn --workers=4 --bind=0.0.0.0:5000 --timeout=120 app:create_app()
 ```
 
-Full uninstall notes: <https://ticc-dash.org/uninstall.html>.
-
----
-
-## 🧠 How it works
-
-- Runs `chronyc clients` via `sudo` to collect live NTP client data.
-- Parses and groups hostnames, IPv4 and IPv6.
-- Exposes two endpoints: `/` (dashboard UI) and `/data` (JSON).
-- Frontend uses small AJAX calls every second for live updates.
-- Sorting, filtering, and row expansion handled client‑side.
-
-Technical deep‑dive: <https://ticc-dash.org/docs.html>.
-
----
-
-## ⚙️ Requirements
-
-- Debian/Ubuntu Linux
-- Python **3.10+**
-- **chrony** service installed and active
-- Sudo access for `/usr/bin/chronyc` (the installer configures a sudoers rule)
-
----
-
-## 🧩 Installed structure
+### Accessing the Web UI
 
 ```
-/opt/ticc-dash
-├── ticc-dash.py
-├── venv/
-└── static/
-    └── img/
-        └── ticc-dash-logo.png
+http://localhost:5000
 ```
-
-Systemd unit: `/etc/systemd/system/ticc-dash.service`  
-Sudoers rule: `/etc/sudoers.d/ticc-dash`
 
 ---
 
-## 🔧 Managing the service
+## 🔍 API Reference
+
+### Base URL
+
+```
+http://localhost:5000/api/v1
+```
+
+### Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/clients` | GET | List all chrony clients |
+| `/api/v1/clients/<id>` | GET | Get client details |
+| `/api/v1/clients/<id>` | PUT | Update client settings |
+| `/api/v1/clients/<id>` | DELETE | Delete client |
+| `/api/v1/servers` | GET | List NTP servers |
+| `/api/v1/servers/<id>` | GET | Get server details |
+| `/api/v1/servers/<id>` | PUT | Update server settings |
+| `/api/v1/servers/<id>` | DELETE | Delete server |
+| `/api/v1/drift` | GET | Get drift analysis |
+| `/api/v1/drift/history` | GET | Get drift history |
+| `/api/v1/logs` | GET | List logs |
+| `/api/v1/logs/search` | GET | Search logs |
+| `/api/v1/logs/<id>` | GET | Get log entry |
+| `/api/v1/health` | GET | System health check |
+| `/api/v1/dashboard` | GET | Dashboard statistics |
+
+---
+
+## 📊 Monitoring
+
+### System Health
 
 ```bash
-sudo systemctl status ticc-dash.service
-sudo systemctl restart ticc-dash.service
-sudo journalctl -u ticc-dash.service -f
+# Check service status
+sudo systemctl status ntp-dashboard
+
+# Check database connection
+sqlite3 /var/lib/ntp-dashboard/ntp.db "SELECT 1"
+
+# Check Redis
+redis-cli ping
 ```
 
-More commands & explanations: <https://ticc-dash.org/docs.html#manage-the-systemd-service>.
+### Logs
 
----
-
-## 🔁 Upgrading from the old version (Chrony NTP Web Interface V2)
-
-If you used **Chrony NTP Web Interface V2**, migrate easily:
-
-1. Stop and remove the old service
 ```bash
-sudo systemctl stop chronyweb.service
-sudo systemctl disable chronyweb.service
-sudo rm /etc/systemd/system/chronyweb.service
-sudo rm -rf ~/chrony_web
-```
+# Application logs
+sudo tail -f /var/log/ntp-dashboard/app.log
 
-2. Run the TICC‑DASH installer
-```bash
-curl -fsSL https://raw.githubusercontent.com/anoniemerd/ticc-dash/main/install_ticc_dash.sh | bash
-```
-
-3. Then open the dashboard at:
-```
-http://<your-server-ip>:5000/
+# Chrony logs
+sudo tail -f /var/log/syslog | grep chrony
 ```
 
 ---
 
-## 🧠 Troubleshooting
+## 🔒 Security
 
-| Problem | Solution |
-|--------|----------|
-| ❌ No clients showing | Run `sudo chronyc clients` manually to verify |
-| ⚙️ Service not starting | Check logs: `sudo journalctl -u ticc-dash.service -f` |
-| 🔒 Port already in use | Free port 5000 or put a reverse proxy (e.g., Nginx) in front |
-| 🧩 Missing logo | Ensure `ticc-dash-logo.png` exists under `/opt/ticc-dash/static/img/` |
+### Network Security
 
-More tips: <https://ticc-dash.org/docs.html#troubleshooting>.
+- Session-based authentication with Flask-Login
+- CSRF protection on all forms
+- Rate limiting on API endpoints
+
+### Authentication
+
+- Session-based authentication with Flask-Login
+- JWT tokens for API access
+- Role-based access control (RBAC)
 
 ---
 
-## 👤 Author & License
+## 📚 Dependencies
 
-- Author: **Anoniemerd** — <https://github.com/anoniemerd>
-- Website: <https://ticc-dash.org>
+### Python
 
-Released under the **MIT License**.  
-© 2025 – TICC‑DASH Project.
+```
+Flask>=3.0.0
+Flask-SQLAlchemy>=3.0.0
+Flask-Migrate>=3.1.0
+Flask-CORS>=4.0.0
+Flask-Login>=0.6.0
+PyYAML>=6.0
+psycopg2-binary>=2.9.0
+redis>=4.5.0
+requests>=2.31.0
+```
+
+### System Dependencies
+
+```
+chrony>=4.2
+chronyc>=4.2
+```
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+---
+
+## 📄 License
+
+MIT License — free to use, modify, and distribute.
+
+---
+
+## 📞 Support
+
+For issues or questions, please open an issue on GitHub:
+
+https://github.com/OneByJorah/ntp-dash/issues
+
+---
+
+## 🙏 Acknowledgments
+
+- **Flask**: Web framework by Armin Ronacher
+- **Bootstrap**: Frontend framework by Twitter Bootstrap team
+
+---
+
+**Made with ❤️ by [OneByJorah](https://github.com/OneByJorah)**
