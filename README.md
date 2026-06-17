@@ -138,8 +138,8 @@ flowchart TB
 
 ```bash
 # Clone the repository
-git clone https://github.com/OneByJorah/ntp-dash.git
-cd ntp-dash
+git clone https://github.com/OneByJorah/ChronoGuard.git
+cd ChronoGuard
 
 # Install dependencies
 pip install -r requirements.txt
@@ -157,7 +157,7 @@ Edit `config/settings.py`:
 
 ```python
 # Server
-SERVER_NAME = 'ntp-dashboard.local'
+SERVER_NAME = 'ChronoGuardboard.local'
 SECRET_KEY=os.environ.get('SECRET_KEY', 'dev-secret-key')
 
 # Database
@@ -221,10 +221,10 @@ http://localhost:5000/api/v1
 
 ```bash
 # Check service status
-sudo systemctl status ntp-dashboard
+sudo systemctl status ChronoGuardboard
 
 # Check database connection
-sqlite3 /var/lib/ntp-dashboard/ntp.db "SELECT 1"
+sqlite3 /var/lib/ChronoGuardboard/ntp.db "SELECT 1"
 
 # Check Redis
 redis-cli ping
@@ -234,7 +234,7 @@ redis-cli ping
 
 ```bash
 # Application logs
-sudo tail -f /var/log/ntp-dashboard/app.log
+sudo tail -f /var/log/ChronoGuardboard/app.log
 
 # Chrony logs
 sudo tail -f /var/log/syslog | grep chrony
@@ -303,7 +303,7 @@ MIT License — free to use, modify, and distribute.
 
 For issues or questions, please open an issue on GitHub:
 
-https://github.com/OneByJorah/ntp-dash/issues
+https://github.com/OneByJorah/ChronoGuard/issues
 
 ---
 
