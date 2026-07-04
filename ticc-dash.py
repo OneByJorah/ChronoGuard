@@ -1,8 +1,9 @@
 # ticc-dash.py
-from flask import Flask, jsonify, render_template_string
+import socket
 import subprocess
 from datetime import datetime
-import socket
+
+from flask import Flask, jsonify, render_template_string
 
 app = Flask(__name__)
 
@@ -34,7 +35,7 @@ def _parse_client_line(line: str):
         "Int": g(2),
         "IntL": g(3),
         "Last": g(4),
-        "Cmd": g(5)
+        "Cmd": g(5),
     }
 
 def get_chrony_clients():
