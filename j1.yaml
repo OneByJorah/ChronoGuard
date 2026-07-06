@@ -1,0 +1,15 @@
+repo: ChronoGuard
+class: Web
+org: OneByJorah
+owner: Jhonattan L. Jimenez
+license: MIT
+production_score: 56
+last_audit: 2026-07-05
+last_publish: null
+standards_version: "2.1"
+dependencies: []
+deploy_target: scratch
+tailscale_only: false
+public_facing: false
+community_sla_hours: 48
+adoption_tracked: false
