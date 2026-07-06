@@ -7,6 +7,14 @@ from flask import Flask, jsonify, render_template_string
 
 app = Flask(__name__)
 
+@app.after_request
+def add_security_headers(response):
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
 def _is_ipv4(addr: str) -> bool:
     try:
         socket.inet_pton(socket.AF_INET, addr)
@@ -401,4 +409,4 @@ def dashboard():
     return render_template_string(html)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    app.run(host="0.0.0.0", port=5000)
