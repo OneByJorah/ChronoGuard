@@ -96,8 +96,7 @@ def dashboard():
         <meta name="viewport" content="width=device-width, initial-scale=1"/>
         <title>TICC-DASH | Time Information of Chrony Clients – Dashboard</title>
 
-        <!-- Favicons -->
-        <link rel="icon" type="image/png" href="/static/img/favicon.png"/>
+        <!-- Favicon -->
         <link rel="icon" type="image/png" href="/static/img/ticc-dash-logo.png"/>
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
