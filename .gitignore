@@ -21,3 +21,5 @@ Thumbs.db
 .env.local
 # Logs
 *.log
+# Pipeline reports
+reports/
