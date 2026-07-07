@@ -124,6 +124,15 @@ ChronoGuard/
 
 ---
 
+## 🔀 Fork Notes
+
+This repository is a fork of the upstream TICC Dash project maintained by **OneByJorah**.
+
+**Changes from upstream:**
+- Added `Dockerfile` (python:3.11-slim) for containerized deployment
+- Added `docker-compose.yml` with host networking for chrony access
+- Added `.env.example` with Chrony host/port configuration
+
 ## License
 
 MIT

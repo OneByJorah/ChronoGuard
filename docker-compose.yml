@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  chronoguard:
+    build: .
+    container_name: chronoguard
+    ports:
+      - "5000:5000"
+    environment:
+      - CHRONY_HOST=${CHRONY_HOST:-localhost}
+      - CHRONY_PORT=${CHRONY_PORT:-323}
+      - FLASK_DEBUG=${FLASK_DEBUG:-false}
+    volumes:
+      - /var/run/chrony:/var/run/chrony:ro
+    restart: unless-stopped
+    network_mode: host
