@@ -1,144 +1,137 @@
-# ChronoGuard — TICC Dash (Chrony NTP Dashboard)
+<div align="center">
+  <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white">
+  <img src="https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white">
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=for-the-badge">
+</div>
 
-**Version:** v1.0  
-**Status:** Active Development  
-**Repository:** https://github.com/OneByJorah/ChronoGuard
+<br>
 
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Architecture](#architecture)
-- [Technology Stack](#technology-stack)
-- [Features](#features)
-- [Getting Started](#getting-started)
-- [Service Management](#service-management)
-- [Project Structure](#project-structure)
-- [Screenshots](#screenshots)
-- [Contributing](#contributing)
-- [License](#license)
-- [Author](#author)
+<div align="center">
+  <h1>ChronoGuard</h1>
+  <p><strong>Chrony NTP Client Dashboard</strong></p>
+  <p>A sleek, live-updating web interface to monitor your Chrony NTP clients.</p>
+  <p>
+    <a href="#features">Features</a> •
+    <a href="#quick-start">Quick Start</a> •
+    <a href="#architecture">Architecture</a> •
+    <a href="#contributing">Contributing</a>
+  </p>
+</div>
 
 ---
 
-## Overview
+## Screenshot
 
-ChronoGuard (TICC Dash) is a lightweight Flask dashboard for monitoring a local Chrony NTP server/client. It parses live chrony client status and presents it as a responsive web UI showing NTP status, drop counts, polling intervals, and last-seen timestamps.
-
-Designed for quick visibility into NTP health on edge and server infrastructure.
-
----
-
-## Architecture
-
-Client browser → Flask backend (`ticc-dash.py`) → `chronyc` CLI parsing → rendered HTML dashboard.
-
-No database layer: the app reads live `chronyc` output on each request and returns a parsed snapshot.
-
----
-
-## Technology Stack
-
-| Layer | Stack |
-|---|---|
-| Runtime | Linux (Ubuntu 22.04+, Raspberry Pi OS) |
-| Backend | Python / Flask |
-| Metrics Source | Chrony (`chronyc`) |
-| Frontend | HTML5 (server-rendered template strings) |
-| Assets | SVG / PNG logo |
-| VCS | Git + GitHub (`github.com/OneByJorah/ChronoGuard`) |
-
----
+![ChronoGuard Dashboard](docs/screenshot.png)
+*Live-updating NTP client dashboard with Chrony status and synchronization metrics.*
 
 ## Features
 
-- **Live NTP status**: parses `chronyc` client output for connected peers/clients.
-- **Metrics dashboard**: NTP state, drops, polling interval, last command timestamps.
-- **Responsive layout**: CSS grid adapts from 3-column desktop down to mobile.
-- **Zero database**: stateless reads from chrony, low overhead.
+- **Live Dashboard** — Real-time updates without page refresh.
+- **Chrony Integration** — Direct integration with chronyc command output.
+- **Client Monitoring** — Track all NTP clients connected to your Chrony server.
+- **Sync Status** — Visual indicators for synchronization health.
+- **Offset Tracking** — Monitor time offset and frequency drift.
+- **Lightweight** — Single-script Flask application, no database required.
+- **Bootstrap 5 UI** — Clean, responsive interface.
+- **AJAX Updates** — jQuery-powered automatic data refresh.
 
----
-
-## Getting Started
+## Quick Start
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/OneByJorah/ChronoGuard.git
 cd ChronoGuard
 
-# 2. Install dependencies
-pip install -r requirements.txt  # or: pip install flask
-
-# 3. Ensure chrony is installed and running
-sudo apt-get install chrony
-sudo systemctl enable --now chronyd
-
-# 4. Start the dashboard
-python3 ticc-dash.py
+pip install -r requirements.txt
+python3 app.py
 ```
 
-Visit `http://localhost:5000`.
+Open **http://localhost:5000** in your browser.
 
----
-
-## Service Management
+### systemd Service
 
 ```bash
-# Quick test
-python3 ticc-dash.py
-
-# Production: run behind a reverse proxy or systemd unit
-# Example systemd unit location: systemd/pirouter.service (adapt as needed)
+sudo cp chroneguard.service /etc/systemd/system/
+sudo systemctl enable chroneguard
+sudo systemctl start chroneguard
 ```
 
----
+## Configuration
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `FLASK_APP` | `app.py` | Flask application entry point |
+| `PORT` | `5000` | Server port |
+| `HOST` | `0.0.0.0` | Bind address |
+| `CHRONYC_PATH` | `/usr/bin/chronyc` | Path to chronyc binary |
+| `REFRESH_INTERVAL` | `5000` | Dashboard refresh interval (ms) |
+
+## Architecture
+
+```
+Browser (Bootstrap/jQuery) ──AJAX──▶ Flask App ──▶ chronyc ──▶ Chrony Server
+                                              │
+                                              └──▶ Time Sync Data
+```
+
+## Tech Stack
+
+- **Backend**: Flask (Python 3.10+)
+- **Frontend**: Bootstrap 5, jQuery, AJAX
+- **NTP**: Chrony/chronyc integration
+- **Deployment**: systemd service
 
 ## Project Structure
 
 ```
 ChronoGuard/
-├── ticc-dash.py           # Flask app + live chrony parser
-├── install_ticc_dash.sh
-├── uninstall_ticc_dash.sh
-├── static/img/
-│   ├── ticc-dash-logo.png
-│   └── ticc-dash-logo-embedded.svg
+├── app.py                 # Flask application
+├── templates/
+│   └── index.html         # Dashboard template
+├── static/
+│   ├── css/
+│   │   └── style.css      # Custom styles
+│   └── js/
+│       └── app.js         # AJAX update logic
+├── chroneguard.service    # systemd service file
+├── requirements.txt       # Python dependencies
 └── README.md
 ```
 
----
+## API Endpoints
 
-## Screenshots
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/` | GET | Dashboard UI |
+| `/api/status` | GET | Chrony server status |
+| `/api/clients` | GET | Connected NTP clients |
+| `/api/sources` | GET | NTP source statistics |
 
-### TICC Dash
-![TICC Dash](static/img/ticc-dash-logo.png)
+## Dashboard Panels
 
----
+| Panel | Description |
+|-------|-------------|
+| **Server Status** | Chrony daemon status and uptime |
+| **Sync Mode** | Current synchronization mode (NTP, PPS, etc.) |
+| **Sources** | NTP sources with reachability and offset |
+| **Clients** | Connected clients with last query time |
+| **System Time** | Current system time and offset from reference |
 
 ## Contributing
 
-1. Create a feature branch off `main`.
-2. Test against a live `chronyd` instance before submitting.
-3. Submit a PR with description and screenshots for UI changes.
+Contributions are welcome. Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines and [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) for community standards.
 
----
+## Security
 
-## 🔀 Fork Notes
-
-This repository is a fork of the upstream TICC Dash project maintained by **OneByJorah**.
-
-**Changes from upstream:**
-- Added `Dockerfile` (python:3.11-slim) for containerized deployment
-- Added `docker-compose.yml` with host networking for chrony access
-- Added `.env.example` with Chrony host/port configuration
+For security concerns, see [SECURITY.md](SECURITY.md). Please report vulnerabilities to **info@jorahone.com** — do not use public issues.
 
 ## License
 
-MIT
+MIT © Jhonattan L. Jimenez
 
 ---
 
-## Author
-
-Built by **Jhonattan L. Jimenez**.
+<div align="center">
+  <p>Live NTP client monitoring with Chrony.</p>
+  <p><a href="https://github.com/OneByJorah">@OneByJorah</a></p>
+</div>
