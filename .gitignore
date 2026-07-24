@@ -21,3 +21,6 @@ Thumbs.db
 .env.local
 # Logs
 *.log
+
+# OneByJorah portfolio tooling
+.venv-screenshot/
