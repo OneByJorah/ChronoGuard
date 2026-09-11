@@ -126,14 +126,17 @@ sudo systemctl restart "$SERVICE_NAME"
 # 7) Wait for the dashboard to come up
 CURRENT_STEP="waiting for dashboard"
 log "⏳ Waiting for the dashboard to answer..."
+DASHBOARD_UP=0
 for i in $(seq 1 20); do
   if curl -fsS "http://127.0.0.1:$DEFAULT_PORT/api/health" >/dev/null 2>&1; then
     ok "✅ Dashboard is up after ${i}s."
+    DASHBOARD_UP=1
     break
   fi
-  [ "$i" -eq 20 ] && warn "⚠️  Dashboard not answering after 20s — check 'journalctl -u $SERVICE_NAME -e'."
   sleep 1
 done
+# A service that never answers means the install failed — don't report success.
+[ "$DASHBOARD_UP" -eq 1 ] || die "Dashboard did not answer on 127.0.0.1:$DEFAULT_PORT after 20s. Inspect 'journalctl -u $SERVICE_NAME -e' (common causes: port in use, gunicorn/venv failure), then re-run this installer."
 
 # 8) Summary
 echo
