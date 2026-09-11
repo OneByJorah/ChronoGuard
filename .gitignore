@@ -24,3 +24,8 @@ Thumbs.db
 
 # OneByJorah portfolio tooling
 .venv-screenshot/
+
+# Test / lint caches
+.testvenv/
+.pytest_cache/
+.ruff_cache/

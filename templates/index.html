@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>ChronoGuard | Chrony NTP Monitoring Dashboard</title>
+
+    <!-- Favicon + brand -->
+    <link rel="icon" type="image/svg+xml" href="/static/img/chronoguard-logo.svg"/>
+    <link rel="icon" type="image/png" href="/static/img/chronoguard-logo.svg"/>
+
+    <!-- Vendored local assets — no CDN required -->
+    <link rel="stylesheet" href="/static/vendor/bootstrap.min.css"/>
+    <script src="/static/vendor/jquery.min.js"></script>
+    <script src="/static/vendor/bootstrap.bundle.min.js" defer></script>
+    <link rel="stylesheet" href="/static/css/style.css"/>
+</head>
+<body>
+    <!-- Top-right toolbar -->
+    <div class="toolbar" id="toolbar">
+        <label class="switch expand" title="Expand/collapse all client rows">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            </svg>
+            <input type="checkbox" id="expand-toggle"><span class="slider"></span>
+        </label>
+        <label class="switch theme" title="Light/Dark theme">
+            <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M3 12h2M19 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+                <circle cx="12" cy="12" r="5"></circle>
+            </svg>
+            <input type="checkbox" id="theme-toggle"><span class="slider"></span>
+        </label>
+        <div class="info-wrap">
+            <div class="info-btn" id="infoBtn" title="About ChronoGuard">i</div>
+            <div class="info-pop" id="infoPop">
+                <strong>ChronoGuard</strong><br/>
+                Chrony NTP monitoring dashboard — live clients, server state,
+                sources and host events. Runs locally, no external services.<br/>
+                <a href="/api/summary" target="_blank" rel="noopener">Raw JSON <span style="font-family:monospace">/api/summary</span></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="brand-wrap">
+            <img class="brand-logo" src="/static/img/chronoguard-logo.svg" alt="ChronoGuard Logo"/>
+            <div class="title">ChronoGuard</div>
+        </div>
+        <div class="subtitle">Chrony NTP Monitoring Dashboard</div>
+
+        <div class="datetime-block">
+            <div>Date: <span id="date-part">--</span></div>
+            <span class="sep"></span>
+            <div>Time: <span id="time-part">--</span></div>
+        </div>
+
+        <div style="height:14px"></div>
+        <div class="subinfo">
+            <span class="badge bg-primary badge-clients">Clients: <span id="clients-count">0</span></span>
+            <span class="badge bg-success ms-2 d-none d-md-inline" id="sync-badge">Sync: --</span>
+        </div>
+
+        <div class="summary-bar">
+            <span class="summary-pill pill-ok">OK: <span id="count-ok">0</span></span>
+            <span class="summary-pill pill-warn">Warning: <span id="count-warn">0</span></span>
+            <span class="summary-pill pill-bad">Critical: <span id="count-bad">0</span></span>
+        </div>
+
+        <!-- Section tabs -->
+        <ul class="nav nav-tabs cg-tabs" id="cgTabs" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab"
+                data-bs-target="#pane-clients" type="button" role="tab">Clients</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                data-bs-target="#pane-tracking" type="button" role="tab">Tracking</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                data-bs-target="#pane-sources" type="button" role="tab">Sources</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                data-bs-target="#pane-stats" type="button" role="tab">Source Stats</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                data-bs-target="#pane-activity" type="button" role="tab">Activity</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab"
+                data-bs-target="#pane-events" type="button" role="tab">Events</button></li>
+        </ul>
+
+        <div class="tab-content cg-tab-content">
+
+            <!-- ============================ CLIENTS ============================ -->
+            <div class="tab-pane fade show active" id="pane-clients" role="tabpanel">
+                <div class="controls">
+                    <select id="sort-select" class="form-select" title="Sort clients">
+                        <option value="ip_order">Sort by: IP Address (numeric)</option>
+                        <option value="drop_desc">Sort by: Drop Count (high &rarr; low)</option>
+                        <option value="last_recent">Sort by: Last Seen (recent &rarr; old)</option>
+                        <option value="severity">Sort by: Severity</option>
+                    </select>
+                    <input id="search" type="text" class="form-control" placeholder="Search clients..."/>
+                </div>
+                <div class="table-wrap">
+                    <table class="table table-hover align-middle client-table">
+                        <colgroup>
+                            <col style="width:32px"/><col/><col style="width:104px"/>
+                            <col style="width:76px"/><col style="width:76px"/><col style="width:76px"/>
+                            <col style="width:76px"/><col style="width:104px"/><col style="width:132px"/>
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th class="caret-cell"></th>
+                                <th>Address</th>
+                                <th class="text-center">Status</th>
+                                <th class="text-end">NTP</th>
+                                <th class="text-end">Drop</th>
+                                <th class="text-end">Int</th>
+                                <th class="text-end">IntL</th>
+                                <th class="text-end">Cmd</th>
+                                <th>Last Seen</th>
+                            </tr>
+                        </thead>
+                        <tbody id="client-tbody"><tr><td colspan="9" class="text-center text-dim py-3">Waiting for data…</td></tr></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================ TRACKING =========================== -->
+            <div class="tab-pane fade" id="pane-tracking" role="tabpanel">
+                <div id="tracking-error" class="section-error d-none"></div>
+                <div class="tracking-card">
+                    <div class="track-flags">
+                        <span id="t-leap" class="track-flag">Leap: --</span>
+                        <span id="t-stratum" class="track-flag">Stratum: --</span>
+                        <span id="t-sync" class="track-flag">State: --</span>
+                    </div>
+                    <div class="metrics">
+                        <div class="metric"><div class="label">🖥 Reference</div><div class="value" id="t-ref">--</div></div>
+                        <div class="metric"><div class="label">🕰 System time</div><div class="value" id="t-systime">--</div></div>
+                        <div class="metric"><div class="label">📏 Last offset</div><div class="value" id="t-last-offset">--</div></div>
+                        <div class="metric"><div class="label">📊 RMS offset</div><div class="value" id="t-rms-offset">--</div></div>
+                        <div class="metric"><div class="label">⚡ Frequency</div><div class="value" id="t-frequency">--</div></div>
+                        <div class="metric"><div class="label">📐 Skew</div><div class="value" id="t-skew">--</div></div>
+                        <div class="metric"><div class="label">🌍 Root delay</div><div class="value" id="t-root-delay">--</div></div>
+                        <div class="metric"><div class="label">🌀 Root dispersion</div><div class="value" id="t-root-disp">--</div></div>
+                        <div class="metric"><div class="label">⏱ Update interval</div><div class="value" id="t-update-int">--</div></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ============================ SOURCES ============================ -->
+            <div class="tab-pane fade" id="pane-sources" role="tabpanel">
+                <div id="sources-error" class="section-error d-none"></div>
+                <div class="table-wrap">
+                    <table class="table table-hover align-middle client-table">
+                        <colgroup>
+                            <col style="width:56px"/><col/><col style="width:80px"/>
+                            <col style="width:70px"/><col style="width:70px"/><col style="width:80px"/><col style="width:200px"/>
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>MS</th><th>Name / IP</th><th class="text-center">State</th>
+                                <th class="text-end">Stratum</th><th class="text-end">Poll</th>
+                                <th class="text-end">Reach</th><th>Last Sample</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sources-tbody"></tbody>
+                    </table>
+                    <div class="legend-note">MS legend: <code>^</code>=server <code>=</code>=peer <code>#</code>=local clock &nbsp;·&nbsp; State: <code>*</code>=synced <code>+</code>=combined <code>-</code>=not combined <code>?</code>=unreachable <code>x</code>=error <code>~</code>=variable</div>
+                </div>
+            </div>
+
+            <!-- ============================ STATS ============================ -->
+            <div class="tab-pane fade" id="pane-stats" role="tabpanel">
+                <div id="stats-error" class="section-error d-none"></div>
+                <div class="table-wrap">
+                    <table class="table table-hover align-middle client-table">
+                        <thead>
+                            <tr>
+                                <th>Name / IP</th><th class="text-end">NP</th><th class="text-end">NR</th>
+                                <th class="text-end">Span</th><th class="text-end">Frequency</th>
+                                <th class="text-end">Freq Skew</th><th class="text-end">Offset</th>
+                                <th class="text-end">Std Dev</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stats-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ============================ ACTIVITY =========================== -->
+            <div class="tab-pane fade" id="pane-activity" role="tabpanel">
+                <div id="activity-error" class="section-error d-none"></div>
+                <div class="activity-strip">
+                    <div class="act-chip ch-ok"><span class="act-label">Online</span><span class="act-num" id="a-online">--</span></div>
+                    <div class="act-chip ch-warn"><span class="act-label">Offline</span><span class="act-num" id="a-offline">--</span></div>
+                    <div class="act-chip ch-info"><span class="act-label">Burst resync</span><span class="act-num" id="a-burst">--</span></div>
+                    <div class="act-chip ch-warn"><span class="act-label">Unknown</span><span class="act-num" id="a-unknown">--</span></div>
+                    <div class="act-chip ch-bad"><span class="act-label">In error</span><span class="act-num" id="a-error">--</span></div>
+                </div>
+            </div>
+
+            <!-- ============================ EVENTS ============================= -->
+            <div class="tab-pane fade" id="pane-events" role="tabpanel">
+                <div id="events-error" class="section-error d-none"></div>
+                <div class="events-toolbar">
+                    <span class="text-dim">Last <span id="events-count">0</span> chrony events</span>
+                    <button class="btn btn-sm btn-outline-secondary" id="events-scroll-toggle" title="Auto-scroll">⤓ autoscroll</button>
+                </div>
+                <div class="events-feed" id="events-feed">
+                    <div class="text-dim text-center py-3">Waiting for data…</div>
+                </div>
+            </div>
+
+        </div>
+
+        <footer class="cg-footer text-dim">
+            ChronoGuard · powered by the local Chrony daemon · data refreshed automatically
+        </footer>
+    </div>
+
+    <script>
+        window.CHRONOGUARD = { refreshInterval: {{ refresh_interval }} };
+    </script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

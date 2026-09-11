@@ -1,0 +1,18 @@
+[Unit]
+Description=ChronoGuard - Chrony NTP Monitoring Dashboard
+Documentation=https://github.com/OneByJorah/ChronoGuard
+After=network.target chronyd.service
+Wants=chronyd.service
+
+[Service]
+# __CHRONOGUARD_USER__ is replaced by install_chronoguard.sh with the
+# account that ran the installer (must be allowed NOPASSWD for chronyc).
+User=__CHRONOGUARD_USER__
+WorkingDirectory=/opt/chronoguard
+ExecStart=/opt/chronoguard/venv/bin/gunicorn --workers 2 --bind 0.0.0.0:5000 chronoguard:app
+Restart=always
+RestartSec=3
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
