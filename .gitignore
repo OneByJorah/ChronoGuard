@@ -21,6 +21,8 @@ Thumbs.db
 .env.local
 # Logs
 *.log
+# ...except the pytest events fixture, which is tracked test data
+!tests/events_sample.log
 
 # OneByJorah portfolio tooling
 .venv-screenshot/
